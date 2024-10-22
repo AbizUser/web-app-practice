@@ -1,8 +1,26 @@
-import TaskCard from "@/components/TaskCard/TaskCard"
-import Link from "next/link"
-import { MdAddTask } from "react-icons/md"
+import TaskCard from "@/components/TaskCard/TaskCard";
+import { TaskDocument } from "@/models/tasks";
+import Link from "next/link";
+import { MdAddTask } from "react-icons/md";
 
-const MainPage = () => {
+const getAllTasks = async (): Promise<TaskDocument[]> => {
+  const response = await fetch(`${process.env.API_URL}/tasks`, {
+    cache: "no-store",
+    //APIは頻繁に更新されるのでキャッシュを無効化
+  });
+
+  if (response.status !== 200) {
+    throw new Error();
+  }
+
+  const data = await response.json();
+  return data.tasks as TaskDocument[];
+}
+
+export default async function MainPage() {
+
+  const allTasks = await getAllTasks();
+  
   return (
     <div className="text-gray-800 p-8 h-full overflow-y-auto pd-24">
       <header className="flex justify-between items-center">
@@ -21,4 +39,4 @@ const MainPage = () => {
   )
 }
 
-export default MainPage
+// export default MainPage
