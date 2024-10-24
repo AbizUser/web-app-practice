@@ -9,22 +9,39 @@ export interface FormState {
 }
 
 export const createTask = async (state: FormState, formData: FormData) => {
-  const newTask = {
+  const newTask: Task = {
     //より厳格なアプリケーションの作成をする場合にはここにバリデーションロジックを追加する
     title: formData.get('title') as string,
-    description: formData.get('title') as string,
-    dueDate: formData.get('title') as string,
+    description: formData.get('description') as string,
+    dueDate: formData.get('dueDate') as string,
     isCompleted: false,
   }
-
   try {
-    await connectDb()
-    await TaskModel.create(newTask)
-
+    await connectDb();
+    await TaskModel.create(newTask);
   } catch (error) {
-      state.error = "タスクの作成に失敗しました";
-      return state
+      state.error = "タスクの更新に失敗しました";
+      return state;
   }
   //トライキャッチの外側で定義しないと使用できない。
-  redirect('/')
+  redirect('/');
+
 }
+
+export const updateTask = async (id: string, state: FormState, formData: FormData) => {
+  const updateTask: Task = {
+    title: formData.get('title') as string,
+    description: formData.get('description') as string,
+    dueDate: formData.get('dueDate') as string,
+    isCompleted: Boolean(formData.get('isCompleted')),
+  };
+  try {
+    await connectDb();
+    await TaskModel.updateOne({_id: id}, updateTask);
+  } catch (error) {
+      state.error = "タスクの更新に失敗しました。"
+      return state;
+  }
+  redirect('/');
+};
+
